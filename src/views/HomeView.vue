@@ -12,28 +12,42 @@ try {
   parsedItems = [];
 }
 
-interface GemItem { name: string; total: number; remaining: number; start_date: Date; end_date: Date; min_payment: number; }
+interface GemItem {
+    name: string;
+    total: number;
+    remaining: number;
+    start_date: Date;
+    end_date: Date;
+    min_payment: number;
+}
 
 const items: GemItem[] = reactive(parsedItems);
 
 const show_add = ref(false);
 
 const item_name = ref('');
-const item_total = ref('');
-const item_remaining = ref('');
+const item_total = ref(0);
+const item_remaining = ref(0);
 const item_start_date = ref('');
 const item_end_date = ref('');
-const item_min_payment = ref('');
+const item_min_payment = ref(0);
 
 const addItem = () => {
-  items.push({ name: item_name.value, total: item_total.value, remaining: item_remaining.value, start_date: item_start_date.value, end_date: item_end_date.value, min_payment: item_min_payment.value || 0 });
+  items.push({
+      name: item_name.value,
+      total: item_total.value,
+      remaining: item_remaining.value,
+      start_date: item_start_date.value as Date,
+      end_date: item_end_date.value as Date,
+      min_payment: item_min_payment.value
+  });
   saveData();
   item_name.value = '';
-  item_total.value = '';
-  item_remaining.value = '';
+  item_total.value = 0;
+  item_remaining.value = 0;
   item_start_date.value = '';
   item_end_date.value = '';
-  item_min_payment.value  = '';
+  item_min_payment.value  = 0;
 }
 
 const deleteItem = (index) => {
@@ -42,9 +56,9 @@ const deleteItem = (index) => {
 }
 
 const adjustItem = (item: GemItem) => {
-  let new_remaining = prompt("Please enter new remaining", item.remaining);
+  let new_remaining = prompt("Please enter new remaining", item.remaining as string);
   if (new_remaining != null) {
-    item.remaining = new_remaining;
+    item.remaining = new_remaining as number;
   }
   saveData();
 }
@@ -58,13 +72,13 @@ const saveData = () => {
 function calculateItemRepayment(item: GemItem): number {
   const total = item.total;
   const remaining = item.remaining;
-  const startDateStr = item.start_date;
-  const endDateStr = item.end_date;
+  const startDateStr = item.start_date.toString();
+  const endDateStr = item.end_date.toString();
   const minPayment = item.min_payment;
 
   const startDate = DateTime.fromISO(startDateStr);
   const endDate = DateTime.fromISO(endDateStr);
-  const firstRepayment = DateTime.fromISO(DateTime.now());
+  const firstRepayment = DateTime.fromISO(DateTime.now().toString());
 
   // repayment every month on the same day
   let repaymentDay = firstRepayment.day;
