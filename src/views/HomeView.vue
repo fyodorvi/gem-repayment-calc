@@ -7,7 +7,7 @@ const defaultItems = localStorage.getItem('GemItems');
 let parsedItems;
 
 try {
-  parsedItems = JSON.parse(defaultItems as string);
+  parsedItems = JSON.parse(defaultItems as string) || [];
 } catch (e) {
   parsedItems = [];
 }
