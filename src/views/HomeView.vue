@@ -7,18 +7,18 @@ const defaultItems = localStorage.getItem('GemItems');
 let parsedItems;
 
 try {
-  parsedItems = JSON.parse(defaultItems);
+  parsedItems = JSON.parse(defaultItems as string);
 } catch (e) {
   parsedItems = [];
 }
 
 interface GemItem {
     name: string;
-    total: number;
-    remaining: number;
-    start_date: Date;
-    end_date: Date;
-    min_payment: number;
+    total: string;
+    remaining: string;
+    start_date: string;
+    end_date: string;
+    min_payment: string;
 }
 
 const items: GemItem[] = reactive(parsedItems);
@@ -26,39 +26,39 @@ const items: GemItem[] = reactive(parsedItems);
 const show_add = ref(false);
 
 const item_name = ref('');
-const item_total = ref(0);
-const item_remaining = ref(0);
+const item_total = ref('');
+const item_remaining = ref('');
 const item_start_date = ref('');
 const item_end_date = ref('');
-const item_min_payment = ref(0);
+const item_min_payment = ref('');
 
 const addItem = () => {
   items.push({
       name: item_name.value,
       total: item_total.value,
       remaining: item_remaining.value,
-      start_date: item_start_date.value as Date,
-      end_date: item_end_date.value as Date,
+      start_date: item_start_date.value,
+      end_date: item_end_date.value,
       min_payment: item_min_payment.value
   });
   saveData();
   item_name.value = '';
-  item_total.value = 0;
-  item_remaining.value = 0;
+  item_total.value = '';
+  item_remaining.value = '';
   item_start_date.value = '';
   item_end_date.value = '';
-  item_min_payment.value  = 0;
+  item_min_payment.value  = '';
 }
 
-const deleteItem = (index) => {
+const deleteItem = (index: number) => {
   items.splice(index, 1);
   saveData();
 }
 
 const adjustItem = (item: GemItem) => {
-  let new_remaining = prompt("Please enter new remaining", item.remaining as string);
+  let new_remaining = prompt("Please enter new remaining", item.remaining);
   if (new_remaining != null) {
-    item.remaining = new_remaining as number;
+    item.remaining = new_remaining;
   }
   saveData();
 }
@@ -88,10 +88,10 @@ function calculateItemRepayment(item: GemItem): number {
   const monthsLeftToRepay = Math.ceil(endDate.diff(firstRepayment).as('months'));
 
   if (minPayment) {
-    return minPayment;
+    return parseInt(minPayment, 10);
   }
 
-  return Math.ceil(remaining / monthsLeftToRepay * 100) / 100;
+  return Math.ceil(parseInt(remaining, 10) / monthsLeftToRepay * 100) / 100;
 }
 
 const totalToPay = computed(() => {
@@ -155,7 +155,7 @@ const totalToPay = computed(() => {
         <td>${{ item.remaining }}</td>
         <td nowrap="nowrap">{{ item.start_date }}</td>
         <td nowrap="nowrap">{{ item.end_date }}</td>
-        <td><span v-if="item.min_payment > 0">${{ item.min_payment }}</span></td>
+        <td><span v-if="parseInt(item.min_payment, 10) > 0">${{ item.min_payment }}</span></td>
         <td>${{ calculateItemRepayment(item).toFixed(2) }}</td>
         <td><button v-on:click="adjustItem(item)">Adjust</button></td>
         <td><button v-on:click="deleteItem(index)">X</button></td>
